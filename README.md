@@ -1,59 +1,91 @@
 # EmailReportify
 
-**EmailReportify** is a powerful Python application designed to search through your email inbox for emails matching a specific subject pattern and compile a detailed report in CSV format. This tool is particularly useful for users who need to track emails about specific topics, such as "Bug" reports, and organize this information outside their email clients for further analysis or record-keeping.
+EmailReportify provides functionality to read, filter, sort, and output email data from an IMAP server. It supports generating statistics and exporting emails to CSV, JSON, or XML formats based on user-specified criteria.
 
-## Features
+### Features
 
-- **Flexible Email Search**: Specify any subject pattern to search for in your inbox.
-- **Comprehensive Reporting**: Generates a CSV report containing the date, sender, subject, and content of each matching email.
-- **Secure Access**: Utilizes your email credentials securely without storing them.
-- **Easy Configuration**: Simple setup with minimal configuration required.
+- **Email Retrieval and Display**
+  - Fetches emails from the specified email account using IMAP.
+  - Displays email data in a tabular format on the console using `tabulate`.
 
-## Setup
+- **Filtering and Sorting**
+  - Filters emails based on Subject, Sender, or Date criteria provided by the user.
+  - Sorts filtered emails by Date or Sender.
 
-### Prerequisites
+- **Output Options**
+  - Outputs filtered and sorted emails to CSV, JSON, or XML files.
+  - Supports different file formats for exporting data.
 
-- Python 3.x installed on your system.
-- Access to an email account with IMAP support.
+- **Statistics Generation**
+  - Computes and displays statistics about the email data set, including total email count, top senders, and common subjects.
 
-### Installation
+### Usage
 
-1. Clone or download the EmailReportify repository to your local machine.
-2. Navigate to the EmailReportify directory.
-3. There are no external dependencies required beyond the Python Standard Library, so no need for a `requirements.txt` file.
+To use the tool, follow these steps:
 
-## Configuration
+1. **Requirements**
+   - Python 3.x
+   - Required Python packages (`argparse`, `tabulate`, etc.) which can be installed using `pip`.
 
-Before running EmailReportify, you need to set up the necessary configuration:
+2. **Setup**
+   - Clone the project repository.
+   - Install dependencies using `pip install -r requirements.txt` (if provided).
 
-1. Open the `config.py` file in a text editor.
-2. Update the `IMAP_SERVER` variable to match your email provider's IMAP server address. For example, for Gmail users: `IMAP_SERVER = 'imap.gmail.com'`.
+3. **Running the Tool**
+   - Navigate to the project directory.
+   - Execute the script `python manager.py --email <email_address> --filter <filter_criteria> --sort <sort_criteria> --output <output_file>`.
 
-## Usage
+   **Arguments:**
+   - `--email`: Required. Email address to log in.
+   - `--filter`: Optional. Filter emails by Subject, Sender, or Date. Use format "key=value". Can be specified multiple times.
+   - `--sort`: Optional. Sort emails by Date or Sender.
+   - `--output`: Optional. Output CSV, JSON, or XML file to write the emails.
+   - `--delete`: Delete email filtered
 
-To use EmailReportify, run the `manager.py` script with the necessary arguments. Here's how you can do it:
+4. **Examples**
 
-```
-python manager.py --email YOUR_EMAIL --output OUTPUT_FILE.csv --subject "SUBJECT_PATTERN"
-```
+   - **Display emails in tabular format:**
+     ```
+     python manager.py --email user@example.com
+     ```
 
-Replace the following:
-- `YOUR_EMAIL` with your email address.
-- `OUTPUT_FILE.csv` with the desired output CSV file name.
-- `SUBJECT_PATTERN` with the subject pattern you want to search for.
+   - **Filter and sort emails, output to CSV file:**
+     ```
+     python manager.py --email user@example.com --filter Sender=johndoe@example.com --sort Date --output filtered_emails.csv
+     ```
 
-### Example
+   - **Generate statistics only:**
+     ```
+     python manager.py --email user@example.com --output stats.json
+     ```
 
-```
-python manager.py --email example@gmail.com --output bugs_report.csv --subject "Bug"
-```
+### Structure
 
-This command searches for emails with the subject containing "Bug" and generates a CSV report named `bugs_report.csv`.
+The project is structured as follows:
 
-## Security Note
+- **`manager.py`**: Main script handling email retrieval, filtering, sorting, and output functionalities.
+- **`core/email_reader.py`**: Module for handling IMAP email retrieval.
+- **`core/generator.py`**: Module for generating CSV, JSON, and XML outputs.
+- **`core/stats.py`**: Module for computing email statistics.
+- **`config.py`**: Configuration file for storing constants and configurations.
 
-Your email and password are used only for logging into your email account to fetch emails and are not stored or used for any other purposes. However, ensure you keep your credentials secure and consider using app-specific passwords if your email provider supports them.
+### Dependencies
 
-## License
+- **Python Libraries**:
+  - `argparse`: For parsing command-line arguments.
+  - `tabulate`: For formatting data into tables.
+  - Additional libraries may be required based on specific functionalities and modules used.
 
-EmailReportify is open-source software licensed under the MIT License.
+### Notes
+
+- Ensure proper configuration (`config.py`) with IMAP server details and other necessary constants.
+- Handle authentication securely by prompting for the password using `getpass`.
+- Customize and extend functionalities as per project requirements.
+
+### License
+
+This project is licensed under the MIT License. See `LICENSE` file for details.
+
+---
+
+This README provides an overview of the email handling and analysis tool, guiding users on installation, usage, and customization. It aims to facilitate efficient email data management and analysis tasks using Python.

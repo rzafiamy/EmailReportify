@@ -6,6 +6,7 @@ from .generator import Generator
 import os
 import json
 import getpass
+from datetime import datetime
 
 class EmailReader:
     def __init__(self, email):
@@ -26,7 +27,7 @@ class EmailReader:
             print(f"Error: {e}")
             self.load_net()
     
-    def load_net(self, box='inbox'):
+    def load_net(self, box=config.MAILBOX):
         
         password = config.PASSWORD
 
@@ -40,6 +41,8 @@ class EmailReader:
         status, messages = self.mail.search(None, 'ALL')
 
         if status == 'OK':
+            index = 0
+            error = 0
             for num in messages[0].split():
                 status, data = self.mail.fetch(num, '(RFC822)')
                 if status == 'OK':
@@ -55,10 +58,17 @@ class EmailReader:
                             'Date': date,
                             'Sender': sender,
                             'Subject': subject,
-                            'Content': content
+                            'Content': content,
+                            'UID': num.decode()
                         })
+                        index += 1
+                        # clear console screen
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print(f"Emails loaded: {index}, Errors: {error}, UID: {num.decode()}")
+
                     except Exception as e:
                         print(f"Error: {e}")
+                        error += 1
             # save to cache file
             name = self.email.split('@')[0]
             Generator.generate_json(f'.{name}.json', self.email_data_list)
@@ -92,3 +102,44 @@ class EmailReader:
             except UnicodeDecodeError:
                 content = payload.decode('iso-8859-1')  # Fall back to ISO-8859-1
         return content
+    
+    def delete_emails(self, uids):
+        if not config.PASSWORD:
+            password = getpass.getpass(prompt='Enter your email password: ')
+        
+        try:
+            self.mail = imaplib.IMAP4_SSL(config.IMAP_SERVER)
+            self.mail.login(self.email, password)
+            self.mail.select(config.MAILBOX)
+
+            for uid in uids:
+                # get the email message if uid == email['UID'] in email_data_list
+                for em in self.email_data_list:
+                    if uid == em['UID']:
+                        datem = em['Date']
+                        # Format datem to match the search query
+                        datem = datetime.strptime(datem, '%Y-%m-%d %H:%M:%S').strftime('%d-%b-%Y')
+                        search_query = f'(FROM "{em["Sender"]}" SENTON {datem})'
+
+                        status, messages = self.mail.search(None, search_query)
+
+                        if status == 'OK':
+                            for num in messages[0].split():
+                                status, data = self.mail.fetch(num, '(RFC822)')
+                                if status == 'OK':
+                                    msg = email.message_from_bytes(data[0][1])
+                                    subject = decode_header(msg['Subject'])[0][0]
+                                    date = email.utils.parsedate_to_datetime(msg['Date']).strftime('%Y-%m-%d %H:%M:%S')
+                                    if isinstance(subject, bytes):
+                                        subject = subject.decode()
+                                    if subject == em['Subject'] and date == em['Date']:
+                                        self.mail.store(num, '+FLAGS', '\\Deleted')
+                                        print(f"Deleted: {em['Subject']} from {em['Sender']} on {em['Date']}")
+                                        break
+        except Exception as e:
+            print(f"Error: {e}")
+        finally:
+            self.mail.logout()
+                
+                
+                
