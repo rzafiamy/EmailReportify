@@ -1,5 +1,5 @@
 # Configure server and email address
-IMAP_SERVER = 'webmail.infodev.ovh'
+IMAP_SERVER = 'outlook.office365.com' #'webmail.infodev.ovh'
 # Enter your email address
 EMAIL = 'toto@example.com'
 # Leave PASSWORD empty if you want to enter it manually

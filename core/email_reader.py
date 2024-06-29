@@ -66,10 +66,15 @@ class EmailReader:
                         os.system('cls' if os.name == 'nt' else 'clear')
                         print(f"Emails loaded: {index}, Errors: {error}, UID: {num.decode()}")
 
+                        # save every 500 emails
+                        if index % 500 == 0:
+                            name = self.email.split('@')[0]
+                            Generator.generate_json(f'.{name}.json', self.email_data_list)
+
                     except Exception as e:
                         print(f"Error: {e}")
                         error += 1
-            # save to cache file
+        
             name = self.email.split('@')[0]
             Generator.generate_json(f'.{name}.json', self.email_data_list)
         else:
