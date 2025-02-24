@@ -1,0 +1,4 @@
+IMAP_SERVER: "outlook.office365.com"
+EMAIL: "your_email@example.com"
+PASSWORD: ""  # Leave empty for manual entry
+MAILBOX: "inbox"
